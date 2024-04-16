@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">AndroidHW18</string>
+    <string name="to_photograph">To photograph</string>
+    <string name="take_photo">take photo</string>
+</resources>
