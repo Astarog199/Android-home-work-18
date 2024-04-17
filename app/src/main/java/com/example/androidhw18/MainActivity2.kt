@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -14,7 +15,11 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
+import com.example.androidhw18.Data.App
+import com.example.androidhw18.Data.SightDao
 import com.example.androidhw18.databinding.ActivityMain2Binding
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -22,8 +27,16 @@ import java.util.concurrent.Executor
 
 private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss"
 
-class MainActivity2(val viewModel:MainViewModel) : AppCompatActivity() {
+class MainActivity2() : AppCompatActivity() {
 
+    val viewModel:MainViewModel by viewModels{
+        object : ViewModelProvider.Factory{
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                val sightDao: SightDao = (application as App).db.sightDao()
+                return MainViewModel(sightDao) as T
+            }
+        }
+    }
     private var imageCapture: ImageCapture? = null
     private lateinit var executer: Executor
     private lateinit var binding: ActivityMain2Binding

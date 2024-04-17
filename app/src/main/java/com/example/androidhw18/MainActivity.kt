@@ -9,7 +9,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.bumptech.glide.Glide
 import com.example.androidhw18.Data.App
+import com.example.androidhw18.Data.Sight
 import com.example.androidhw18.Data.SightDao
 import com.example.androidhw18.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
@@ -17,6 +19,8 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
+    val values = mutableListOf<Sight>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,16 +37,25 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.button.setOnClickListener {
-            val intent = Intent(this, MainActivity2(viewModel)::class.java)
+            val intent = Intent(this, MainActivity2()::class.java)
             startActivity(intent)
         }
+
+
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED){
                 viewModel.allSight.collect{photo ->
-                    binding.list.text = photo.joinToString(
-                        separator = "\r\n"
-                    )
+                    if (values.isNullOrEmpty()){
+                        for (i in photo){
+                            values.add(i)
+                        }
+                    }else{
+                        values.add(photo[photo.lastIndex])
+                    }
+
+                    val sightAdapter =  SightAdapter(values)
+                    binding.recyclerView.adapter = sightAdapter
                 }
             }
         }
