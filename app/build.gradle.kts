@@ -75,6 +75,8 @@ dependencies {
     implementation ("androidx.paging:paging-runtime:3.2.1")
     implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1")
+
 
 
 }

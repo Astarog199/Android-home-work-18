@@ -1,4 +1,4 @@
-package com.example.androidhw18
+package com.example.androidhw18.Presentation
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,10 +9,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.bumptech.glide.Glide
 import com.example.androidhw18.Data.App
 import com.example.androidhw18.Data.Sight
 import com.example.androidhw18.Data.SightDao
+import com.example.androidhw18.Presentation.adapter.SightAdapter
 import com.example.androidhw18.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
 
@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val viewModel:MainViewModel by viewModels{
+        val viewModel: MainViewModel by viewModels{
             object : ViewModelProvider.Factory{
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     val sightDao: SightDao = (application as App).db.sightDao()
@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.button.setOnClickListener {
-            val intent = Intent(this, MainActivity2()::class.java)
+            val intent = Intent(this, CameraActivity()::class.java)
             startActivity(intent)
         }
 
@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED){
                 viewModel.allSight.collect{photo ->
-                    if (values.isNullOrEmpty()){
+                    if (values.isEmpty()){
                         for (i in photo){
                             values.add(i)
                         }

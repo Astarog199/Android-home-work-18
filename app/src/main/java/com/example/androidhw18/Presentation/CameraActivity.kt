@@ -1,5 +1,6 @@
-package com.example.androidhw18
+package com.example.androidhw18.Presentation
 
+import android.Manifest
 import android.content.ContentValues
 import android.content.pm.PackageManager
 import android.os.Build
@@ -27,10 +28,10 @@ import java.util.concurrent.Executor
 
 private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss"
 
-class MainActivity2() : AppCompatActivity() {
+class CameraActivity() : AppCompatActivity() {
 
-    val viewModel:MainViewModel by viewModels{
-        object : ViewModelProvider.Factory{
+    val viewModel: MainViewModel by viewModels{
+        object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 val sightDao: SightDao = (application as App).db.sightDao()
                 return MainViewModel(sightDao) as T
@@ -38,16 +39,23 @@ class MainActivity2() : AppCompatActivity() {
         }
     }
     private var imageCapture: ImageCapture? = null
+
     private lateinit var executer: Executor
     private lateinit var binding: ActivityMain2Binding
     private val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
         .format(System.currentTimeMillis())
 
-    private val launcher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){ map ->
-        if (map.values.all { it }){
+    private val launcher = registerForActivityResult(ActivityResultContracts.RequestPermission()){ permissions ->
+        if (permissions){
             startCamera()
         }else{
-            Toast.makeText(this, "permission is not Granted", Toast.LENGTH_SHORT).show()
+            if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)){
+                Toast.makeText(this, "Need permission to use camera.", Toast.LENGTH_SHORT).show()
+                finish()
+            }else{
+                Toast.makeText(this, "Please grant permission to use camera", Toast.LENGTH_SHORT).show()
+                finish()
+            }
         }
     }
 
@@ -57,6 +65,7 @@ class MainActivity2() : AppCompatActivity() {
         setContentView(binding.root)
         executer = ContextCompat.getMainExecutor(this)
         binding.takePhotoButton.setOnClickListener { takePhoto() }
+        binding.butExit.setOnClickListener { finish() }
         checkPermissions()
     }
 
@@ -74,10 +83,14 @@ class MainActivity2() : AppCompatActivity() {
         imageCapture.takePicture(
             outputOptions,
             executer,
-            object :ImageCapture.OnImageSavedCallback{
+            object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    Toast.makeText(this@MainActivity2, "Photo saved on: ${outputFileResults.savedUri}", Toast.LENGTH_SHORT).show()
-                    Glide.with(this@MainActivity2)
+                    Toast.makeText(
+                        this@CameraActivity,
+                        "Photo saved on: ${outputFileResults.savedUri}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    Glide.with(this@CameraActivity)
                         .load(outputFileResults.savedUri)
                         .circleCrop()
                         .into(binding.imagePreview)
@@ -85,7 +98,11 @@ class MainActivity2() : AppCompatActivity() {
                 }
 
                 override fun onError(exception: ImageCaptureException) {
-                    Toast.makeText(this@MainActivity2, "Photo failed: ${exception.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@CameraActivity,
+                        "Photo failed: ${exception.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     exception.printStackTrace()
                 }
             }
@@ -108,13 +125,18 @@ class MainActivity2() : AppCompatActivity() {
 
     private fun checkPermissions(){
         val isAllGranted = REQUEST_PERMISSIONS.all {
-                permission -> ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
+                permission -> ContextCompat.checkSelfPermission(
+            this,
+            permission
+        ) == PackageManager.PERMISSION_GRANTED
         }
         if (isAllGranted){
             startCamera()
             Toast.makeText(this, "permission is Granted", Toast.LENGTH_SHORT).show()
         }else{
-            launcher.launch(REQUEST_PERMISSIONS)
+            REQUEST_PERMISSIONS.map {
+                launcher.launch(it)
+            }
         }
     }
 

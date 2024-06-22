@@ -1,4 +1,4 @@
-package com.example.androidhw18
+package com.example.androidhw18.Presentation.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,10 +7,10 @@ import com.bumptech.glide.Glide
 import com.example.androidhw18.Data.Sight
 import com.example.androidhw18.databinding.SightItemBinding
 
-class SightAdapter(private var data: List<Sight>): RecyclerView.Adapter<MysimpleViewHolder>() {
+class SightAdapter(private var data: List<Sight>): RecyclerView.Adapter<ViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MysimpleViewHolder {
-        return MysimpleViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        return ViewHolder(
             SightItemBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
@@ -21,7 +21,7 @@ class SightAdapter(private var data: List<Sight>): RecyclerView.Adapter<Mysimple
 
     override fun getItemCount(): Int = data.size
 
-    override fun onBindViewHolder(holder: MysimpleViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = data.getOrNull(position)
 
         with(holder.binding){
@@ -36,4 +36,3 @@ class SightAdapter(private var data: List<Sight>): RecyclerView.Adapter<Mysimple
     }
 }
 
-class  MysimpleViewHolder(val binding: SightItemBinding) : RecyclerView.ViewHolder(binding.root)
